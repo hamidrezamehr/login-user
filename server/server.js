@@ -2,7 +2,6 @@
 import express from "express";
 import session from "express-session";
 import cors from "cors";
-import svgCaptcha from "svg-captcha";
 
 const app = express();
 
@@ -22,43 +21,33 @@ app.post("/verify", (req, res) => {
   }
 });
 app.get('/captcha', (req, res) => {
-  const small = Math.floor(Math.random() * 9) + 1;     // عدد اول: 1 تا 9
-  const large = Math.floor(Math.random() * 81) + 10;   // عدد دوم: 10 تا 90
+  const small = Math.floor(Math.random() * 9) + 1;
+  const large = Math.floor(Math.random() * 81) + 10;
   const question = `${small} + ${large} = ?`;
   const answer = (small + large).toString();
 
-  // تولید SVG خام با متن تصادفی
-  const captcha = svgCaptcha.create({
-    noise: 0,
-    color: true,
-    background: '#ffffff',
-    width: 150,
-    height: 50,
-  });
-
-  // جایگزینی کامل متن داخل SVG با عبارت ریاضی دلخواه
-  captcha.data = captcha.data.replace(
-    /<text[^>]*>(.*?)<\/text>/,
-    `<text x="10" y="35" font-size="24" fill="black">${question}</text>`
-  );
-
   req.session.captcha = answer;
+
+  const colors = ["red", "blue", "green", "purple", "orange"];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="150" height="50">
+      <rect width="100%" height="100%" fill="#f9f9f9"/>
+      <line x1="0" y1="${Math.random()*50}" x2="150" y2="${Math.random()*50}" stroke="gray" stroke-width="1"/>
+      <circle cx="${Math.random()*150}" cy="${Math.random()*50}" r="3" fill="lightgray"/>
+      <text x="10" y="35" font-size="24" fill="${color}" transform="rotate(${Math.random()*10 - 5}, 75, 25)">
+        ${question}
+      </text>
+    </svg>
+  `;
+
   res.type('svg');
-  res.send(captcha.data);
+  res.send(svg);
 });
 
 
-app.post('/verify', (req, res) => {
-  const { nationalCode, captcha } = req.body;
-  const isCaptchaValid = captcha === req.session.captcha;
-  const isNationalCodeValid = isValidIranianNationalCode(nationalCode);
 
-  if (isCaptchaValid && isNationalCodeValid) {
-    res.json({ success: true });
-  } else {
-    res.json({ success: false, message: "کپچا یا کد ملی نامعتبر است" });
-  }
-});
 
 
 app.listen(4000, () => console.log("✅ Server running on port 4000"));
