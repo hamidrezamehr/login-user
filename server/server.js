@@ -48,6 +48,15 @@ app.get('/captcha', (req, res) => {
 
 
 
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ success: false, message: "خطا در خروج" });
+    }
+    res.clearCookie("connect.sid"); // پاک کردن کوکی سشن
+    res.json({ success: true, message: "خروج موفق" });
+  });
+});
 
 
 app.listen(4000, () => console.log("✅ Server running on port 4000"));
