@@ -1,11 +1,12 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { object, string } from "yup";
 
 const Login = () => {
   const [captchaSvg, setCaptchaSvg] = useState(null);
-
+  const navigate = useNavigate();
   const fetchCaptcha = () => {
     fetch("http://localhost:4000/captcha", {
       credentials: "include",
@@ -13,7 +14,6 @@ const Login = () => {
       .then((res) => res.text())
       .then((data) => setCaptchaSvg(data));
   };
-
 
   useEffect(() => {
     fetch("http://localhost:4000/captcha", {
@@ -62,6 +62,8 @@ const Login = () => {
       const result = await res.json();
       if (result.success) {
         alert("✅ ورود موفق");
+        localStorage.setItem("isAuthenticated", "true");
+        navigate("/survey");
       } else {
         alert("❌ کپچا یا کد ملی نامعتبر است");
       }
@@ -114,19 +116,6 @@ const Login = () => {
               <span className="text-red-500">{errors.captcha.message}</span>
             )}
           </div>
-
-          {/* <div className="mb-3 w-full">
-            <div dangerouslySetInnerHTML={{ __html: captchaSvg }} />
-            <input
-              {...register("captcha", { required: "کپچا الزامی است" })}
-              type="text"
-              placeholder="کد کپچا را وارد کنید"
-              className="w-full mt-2 px-4 py-2 border rounded"
-            />
-            {errors.captcha && (
-              <span className="text-red-500">{errors.captcha.message}</span>
-            )}
-          </div> */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
