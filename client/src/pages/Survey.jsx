@@ -45,7 +45,7 @@ const Survey = () => {
         <h2 className="text-2xl font-bold text-center text-purple-700 mb-6">
           📊 نظرسنجی پزشک
         </h2>
-
+        
         {/* نظر آزاد */}
         <label className="block text-gray-700 font-medium mb-2">
           نظر کلی شما
